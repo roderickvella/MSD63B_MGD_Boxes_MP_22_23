@@ -4,9 +4,17 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 
-public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
+public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback, IPunObservable
 {
     private Vector3 playerScale;
+    private FixedJoystick fixedJoystick;
+    private Vector3 playerPos;
+    private float horizontal;
+    private float vertical;
+    private Rigidbody2D body;
+    private PhotonView photonView;
+    private float runSpeed = 5f;
+
 
     //called automatically when the prefab is instantiated (from the GameManager using PhotonNetwork.instantiate())
     public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -33,15 +41,66 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
 
     }
 
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        //if we own this instance clone, then we need to send our position and scale to the other connected clients
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.localScale);
+        }
+
+        //if we don't own this instance, then we need data for this clone that was streamed for us by photon
+        if (stream.IsReading)
+        {
+            playerPos = (Vector3)stream.ReceiveNext();
+            playerScale = (Vector3)stream.ReceiveNext();
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        photonView = PhotonView.Get(this);
+
+        if (photonView.IsMine)
+        {
+            //this clone own this photon, therefore give it control to the joystick
+            fixedJoystick = GameObject.FindWithTag("Joystick").GetComponent<FixedJoystick>();
+            body = GetComponent<Rigidbody2D>();
+        }
+        else
+        {
+            //if this clone is not managed by the player, then we should destroy the rigidbody so that it's
+            //movement can be controlled by photon data
+            Destroy(GetComponent<Rigidbody2D>());
+        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
         transform.localScale = new Vector3(playerScale.x, playerScale.y, playerScale.z);
+
+        if (photonView.IsMine)
+        {
+            //we own this clone, therefore move object with the data from the joystick
+            horizontal = fixedJoystick.Horizontal;
+            vertical = fixedJoystick.Vertical;
+        }
+        else
+        {
+            //if we don't own this photonView, then we need to manually change its position with
+            //the data from the server. The stream received from OnPhotonSerializeView
+
+            transform.position = Vector3.Lerp(transform.position,playerPos,Time.deltaTime*10);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (photonView.IsMine)
+            body.velocity = new Vector2(horizontal * runSpeed, vertical * runSpeed);
     }
 }

@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     public void SpawnButton()
     {
         //load the colour selected by the user from the dropdown
-        TMP_Dropdown dropdown = GameObject.Find("DropdownColor").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown dropdown = GameObject.Find("DropdownColour").GetComponent<TMP_Dropdown>();
         string colour = dropdown.options[dropdown.value].text; //the selected colour from the dropdown
         //set the size of the box using Random
         float boxRandomSize = Random.Range(0.5f, 0.8f);

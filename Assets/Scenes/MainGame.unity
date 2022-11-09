@@ -887,6 +887,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fixed Joystick
       objectReference: {fileID: 0}
+    - target: {fileID: 1605939441684070, guid: ce5089f3caa5bb042a4d4c23a427bc82, type: 3}
+      propertyPath: m_TagString
+      value: Joystick
+      objectReference: {fileID: 0}
     - target: {fileID: 224070147403872398, guid: ce5089f3caa5bb042a4d4c23a427bc82, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1060,7 +1064,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 805336646}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008528154}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: SpawnButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &805336646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1276,6 +1292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65ad2207017a2418eabf73d2784aa9de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 839959379825769179, guid: 41cc6868800f7044fb732cac66dcba90, type: 3}
 --- !u!1 &1022268425
 GameObject:
   m_ObjectHideFlags: 0
