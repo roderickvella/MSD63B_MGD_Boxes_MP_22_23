@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
@@ -12,13 +13,33 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        if (PhotonNetwork.IsMasterClient)
+            GameObject.Find("ButtonChangeSizes").SetActive(true);
+        else
+            GameObject.Find("ButtonChangeSizes").SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void ChangeSizesButton()
+    {
+        List<PlayerInfo> playerInfos = new List<PlayerInfo>();
+        Photon.Realtime.Player[] allPlayers = PhotonNetwork.PlayerList;
+
+        foreach(Photon.Realtime.Player player in allPlayers)
+        {
+            float size = Random.Range(0.5f, 0.8f);
+            playerInfos.Add(new PlayerInfo() { actorNumber = player.ActorNumber, size = new Vector3(size, size, 1) });
+        }
+
+        string json = JsonConvert.SerializeObject(playerInfos);
+        GetComponent<NetworkManager>().ChangeSizes(json);
+
+
     }
 
     public void SpawnButton()

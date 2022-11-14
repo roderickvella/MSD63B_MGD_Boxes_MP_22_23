@@ -41,6 +41,40 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback, IPu
 
     }
 
+    public void ChangeSizeFromMaster(List<PlayerInfo> playersInfo)
+    {
+        foreach(PlayerInfo playerInfo in playersInfo)
+        {
+            if (photonView.Owner.ActorNumber == playerInfo.actorNumber)
+                this.playerScale = playerInfo.size;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (photonView.IsMine)
+            {
+                //get scale of object this player collided with
+                float scaleOther = collision.transform.localScale.x;
+                //get scale of this player
+                float scaleMine = transform.localScale.x;
+
+                //get id of smallest player
+                int destroyPlayerId;
+                if (scaleMine > scaleOther)
+                    destroyPlayerId = collision.gameObject.GetComponent<PlayerController>().photonView.Owner.ActorNumber;
+                else
+                    destroyPlayerId = this.photonView.Owner.ActorNumber;
+
+                //inform everyone to destroy eaten (smallest) player (box)
+                GameObject.Find("Scripts").GetComponent<NetworkManager>().DestroyPlayer(destroyPlayerId);
+
+            }
+        }
+    }
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         //if we own this instance clone, then we need to send our position and scale to the other connected clients
